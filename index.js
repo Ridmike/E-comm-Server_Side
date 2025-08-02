@@ -1,15 +1,15 @@
 const express = require('express');
-// const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const cors = require('cors');
 const asyncHandler = require('express-async-handler');
 require('dotenv').config();
+
 const app = express();
 const PORT = 3000;
 
 // Middlewares
-app.use(bodyParser.json());
-app.use(cors({ origin: '*' }))
+app.use(express.json());            // Use Express built-in JSON parser
+app.use(cors({ origin: '*' }));
 
 // setting static folder path
 app.use('/image/products', express.static('public/products'));
@@ -34,22 +34,18 @@ app.use('/notification', require('./routes/notification'));
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
+})
+.then(() => console.log("MongoDB connected"))
+.catch(err => console.log(err));
 
-// Example route
-app.get('/', (req, res) => {
-  res.send("API is working");
-});
-
-// Example route using asyncHandler directly in app.js
+// Example route using asyncHandler directly
 app.get('/', asyncHandler(async (req, res) => {
-    res.json({ success: true, message: 'API working successfully', data: null });
+  res.json({ success: true, message: 'API working successfully', data: null });
 }));
 
 // Global error handler
 app.use((error, req, res, next) => {
-    res.status(500).json({ success: false, message: error.message, data: null });
+  res.status(500).json({ success: false, message: error.message, data: null });
 });
 
 // Start server
