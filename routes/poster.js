@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Poster = require('../model/poster');
-const { uploadPosters } = require('../uploadFile');
+const { uploadPoster } = require('../uploadFile');
 const multer = require('multer');
 const asyncHandler = require('express-async-handler');
 
@@ -32,7 +32,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 // Create a new poster
 router.post('/', asyncHandler(async (req, res) => {
     try {
-        uploadPosters.single('img')(req, res, async function (err) {
+        uploadPoster.single('img')(req, res, async function (err) {
             if (err instanceof multer.MulterError) {
                 if (err.code === 'LIMIT_FILE_SIZE') {
                     err.message = 'File size is too large. Maximum filesize is 5MB.';
@@ -77,7 +77,7 @@ router.post('/', asyncHandler(async (req, res) => {
 router.put('/:id', asyncHandler(async (req, res) => {
     try {
         const categoryID = req.params.id;
-        uploadPosters.single('img')(req, res, async function (err) {
+        uploadPoster.single('img')(req, res, async function (err) {
             if (err instanceof multer.MulterError) {
                 if (err.code === 'LIMIT_FILE_SIZE') {
                     err.message = 'File size is too large. Maximum filesize is 5MB.';
