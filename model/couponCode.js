@@ -3,40 +3,40 @@ const mongoose = require('mongoose');
 const couponSchema = new mongoose.Schema({
     couponCode:{
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
     discountType:{
         type: String,
         enum: ['fixed', 'percentage'],
-        require: true
+        required: true
     },
     discountAmount:{
         type: Number,
-        require: true
+        required: true
     },
     minimumPurchaseAmount: {
         type: Number,
-        require: true
+        required: true
     },
     endDate: {
         type: Date,
-        require: true
+        required: true
     },
     status: {
         type: String,
         enum: ['active', 'inactive'],
         default: 'active'
     },
-    applicableCategories: {
+    applicableCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
     },
-    applicableSubCategories: {
+    applicableSubCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'SubCategory',
     },
-    applicableProducts: {
+    applicableProduct: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product'
     },
