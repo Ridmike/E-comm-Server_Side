@@ -1,6 +1,7 @@
 const express = require('express');
 const asyncHandler = require('express-async-handler');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Order = require('../model/order');
 
 // Get all orders
@@ -48,13 +49,49 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
 // Create a new order
 router.post('/', asyncHandler(async (req, res) => {
-    const { userID,orderStatus, items, totalPrice, shippingAddress, paymentMethod, couponCode, orderTotal, trackingUrl } = req.body;
+    const { userID, orderStatus, items, totalPrice, shippingAddress, paymentMethod, couponCode, orderTotal, trackingUrl } = req.body;
     if (!userID || !items || !totalPrice || !shippingAddress || !paymentMethod || !orderTotal) {
         return res.status(400).json({ success: false, message: "User ID, items, totalPrice, shippingAddress, paymentMethod, and orderTotal are required." });
     }
 
     try {
-        const order = new Order({ userID,orderStatus, items, totalPrice, shippingAddress, paymentMethod, couponCode, orderTotal, trackingUrl });
+        // Validate MongoDB ObjectIds
+        if (!mongoose.Types.ObjectId.isValid(userID)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Invalid user ID format" 
+            });
+        }
+
+        // Validate product IDs in items
+        for (let item of items) {
+            if (!mongoose.Types.ObjectId.isValid(item.productId)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Invalid product ID format for product ${item.productName}` 
+                });
+            }
+        }
+
+        // Validate coupon ID if present
+        if (couponCode && !mongoose.Types.ObjectId.isValid(couponCode)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Invalid coupon code format" 
+            });
+        }
+
+        const order = new Order({ 
+            userId: userID,
+            orderStatus, 
+            items, 
+            totalPrice, 
+            shippingAddress, 
+            paymentMethod, 
+            couponCode, 
+            orderTotal, 
+            trackingUrl 
+        });
         const newOrder = await order.save();
         res.json({ success: true, message: "Order created successfully.", data: null });
     } catch (error) {
