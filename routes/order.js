@@ -8,10 +8,18 @@ const Order = require('../model/order');
 router.get('/', asyncHandler(async (req, res) => {
     try {
         const orders = await Order.find()
-        .populate('couponCode', 'id couponCode discountType discountAmount')
-        .populate('userID', 'id name').sort({ _id: -1 });
-        res.json({ success: true, message: "Orders retrieved successfully.", data: orders });
+            .populate('couponCode', 'id couponCode discountType discountAmount')
+            .populate('userId', 'id name')
+            .sort({ _id: -1 });
+
+
+        res.json({ 
+            success: true, 
+            message: "Orders retrieved successfully.", 
+            data: orders 
+        });
     } catch (error) {
+        console.error('Error fetching orders:', error); // Add this line for debugging
         res.status(500).json({ success: false, message: error.message });
     }
 }));
@@ -20,10 +28,11 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/orderByUserId/:userId', asyncHandler(async (req, res) => {
     try {
         const userId = req.params.userId;
-        const orders = await Order.find({ userID: userId })
+        const orders = await Order.find({ userId: userId })
             .populate('couponCode', 'id couponCode discountType discountAmount')
-            .populate('userID', 'id name')
+            .populate('userId', 'id name')
             .sort({ _id: -1 });
+
         res.json({ success: true, message: "Orders retrieved successfully.", data: orders });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
